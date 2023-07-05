@@ -13,6 +13,11 @@ def index():
     """
     return render_template('index.html')
 
+@app.route('/getAnswer', methods=['POST'])
+def answer():
+    requestData = json.loads(request.data)
+    a = requests.post(url='https://api.miragari.com/fast/wxChat',json={'question':requestData['question']})
+    return jsonify({"answer": json.loads(a.text)['choices'][0]['message']['content']})
 
 @app.route('/api/count', methods=['POST'])
 def count():
