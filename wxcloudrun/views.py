@@ -6,6 +6,7 @@ from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter
 from wxcloudrun.model import Counters
 from wxcloudrun.response import make_succ_empty_response, make_succ_response, make_err_response
 import requests
+from sse_starlette.sse import ServerSentEvent, EventSourceResponse
 
 
 @app.route('/')
@@ -71,3 +72,13 @@ def get_count():
     """
     counter = Counters.query.filter(Counters.id == 1).first()
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
+
+
+@app.route('/streamChat', methods=['GET'])
+def create_stream(q):
+    def decorate(generator):
+        for item in generator:
+            yield ServerSentEvent(json.dumps(item, ensure_ascii=False), event='message')
+        yield ServerSentEvent(json.dumps('', ensure_ascii=False), event='stop')
+    return EventSourceResponse(
+        decorate(requests.get(url=f"https://api.miragari.com/fast/streamChat?q={q}").text))
