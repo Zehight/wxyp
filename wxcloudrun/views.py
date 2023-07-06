@@ -82,7 +82,7 @@ def event_stream():
 
 
 def generate(q):
-    response = requests.get(f"https://api.miragari.com/fast/streamChat?q={q}", stream=True)
+    response = requests.get(f"https://api.miragari.com/fast/wxStreamChat?q={q}", stream=True)
     for chunk in response.iter_lines():
         chunkStr = chunk.decode('utf-8')
         if chunkStr.startswith('data'):
