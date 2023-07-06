@@ -74,15 +74,25 @@ def get_count():
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
 
 
+def event_stream():
+    count = 0
+    while True:
+        count += 1
+        yield f"data: {count}\n\n"
+
+
+def generate(q):
+    response = requests.get(f"https://api.miragari.com/fast/streamChat?q={q}", stream=True)
+    for chunk in response.iter_lines():
+        chunkStr = chunk.decode('utf-8')
+        if chunkStr.startswith('data'):
+            chunkJson = json.loads(chunkStr[6:])
+            if (type(chunkJson) == dict):
+                chunkRes = chunkJson['choices'][0]['delta']
+                if 'content' in chunkRes and 'role' not in chunkRes:
+                    yield chunkRes['content'].encode('utf-8')
+
 @app.route('/streamChat', methods=['GET'])
 def create_stream():
     q = request.args.get('q')
-    def decorate(generator):
-        for item in generator:
-            yield f"data: {json.dumps(item, ensure_ascii=False)}\nevent: message\n\n"
-        yield "event: stop\ndata: \n\n"
-    def generate():
-        response = requests.get(f"https://api.miragari.com/fast/streamChat?q={q}")
-        for chunk in response.iter_content(chunk_size=1024):
-            yield chunk
-    return Response(stream_with_context(decorate(generate())))
+    return Response(generate(q), mimetype="text/event-stream")
