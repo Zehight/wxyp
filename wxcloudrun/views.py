@@ -2,7 +2,8 @@ import json
 from flask import render_template, request, jsonify
 from run import app
 import requests
-import powerServices
+from .powerServices import streamAnswer as powerStreamAnswer
+from .powerServices import getStreamAnswer as powerGetStreamAnswer
 
 @app.route('/')
 def index():
@@ -22,12 +23,12 @@ def answer():
 @app.route('/streamAnswer', methods=['POST'])
 def test_chat():
     requestData = json.loads(request.data)
-    result = powerServices.streamAnswer(requestData['question'])
+    result = powerStreamAnswer(requestData['question'])
     return jsonify(result)
 
 
 @app.route('/getStreamAnswer', methods=['POST'])
 def get_chat():
     requestData = json.loads(request.data)
-    result = powerServices.getStreamAnswer(requestData['id'])
+    result = powerGetStreamAnswer(requestData['id'])
     return jsonify(result)
