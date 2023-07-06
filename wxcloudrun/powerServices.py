@@ -3,7 +3,7 @@ import json
 import requests
 
 from datetime import datetime
-from snowflake import Snowflake
+from .snowflake import Snowflake
 
 snowflake = Snowflake(0, 0, 0, datetime(2023, 1, 1))
 

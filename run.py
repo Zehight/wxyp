@@ -2,6 +2,8 @@
 import sys
 
 from wxcloudrun import app
+import os
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 # 启动Flask Web服务
 if __name__ == '__main__':
