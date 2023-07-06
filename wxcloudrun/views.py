@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, Response, stream_with_context
 from run import app
 from wxcloudrun.dao import delete_counterbyid, query_counterbyid, insert_counter, update_counterbyid
 from wxcloudrun.model import Counters
@@ -79,7 +79,10 @@ def create_stream():
     q = request.args.get('q')
     def decorate(generator):
         for item in generator:
-            yield ServerSentEvent(json.dumps(item, ensure_ascii=False), event='message')
-        yield ServerSentEvent(json.dumps('', ensure_ascii=False), event='stop')
-    return EventSourceResponse(
-        decorate(requests.get(url=f"https://api.miragari.com/fast/streamChat?q={q}").text))
+            yield f"data: {json.dumps(item, ensure_ascii=False)}\nevent: message\n\n"
+        yield "event: stop\ndata: \n\n"
+    def generate():
+        response = requests.get(f"https://api.miragari.com/fast/streamChat?q={q}")
+        for chunk in response.iter_content(chunk_size=1024):
+            yield chunk
+    return Response(stream_with_context(decorate(generate())))
