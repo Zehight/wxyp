@@ -77,7 +77,7 @@ def genStreamAnswer(question, id):
             if type(chunkJson) == dict:
                 chunkRes = chunkJson['choices'][0]['delta']
                 if chunkJson['choices'][0]['finish_reason'] == 'stop':
-                    answers[id] = 'stop'
+                    answers[id] = '完成：'+answers[id]
                 if 'content' in chunkRes and 'role' not in chunkRes:
                     answers[id] += chunkRes['content']
 
@@ -97,6 +97,6 @@ def getStreamAnswer(id):
     if id not in answers:
         return {'result': ''}
     result = answers[id]
-    if result == 'stop':
+    if result.startswith('完成：'):
         del answers[id]
     return {'result': result}
