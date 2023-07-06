@@ -75,7 +75,8 @@ def get_count():
 
 
 @app.route('/streamChat', methods=['GET'])
-def create_stream(q):
+def create_stream():
+    q = request.args.get('q')
     def decorate(generator):
         for item in generator:
             yield ServerSentEvent(json.dumps(item, ensure_ascii=False), event='message')
