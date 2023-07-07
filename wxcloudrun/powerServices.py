@@ -68,7 +68,7 @@ answers = {}
 
 def genStreamAnswer(question, id):
     answers[id] = ''
-    response = requests.get(f"https://api.miragari.com/fast/streamChat?q={question}", stream=True)
+    response = requests.get(f"https://api.miragari.com/fast/wxStreamChat?q={question}", stream=True)
     for chunk in response.iter_lines():
         chunkStr = chunk.decode('utf-8')
         if chunkStr.startswith('data: {'):
